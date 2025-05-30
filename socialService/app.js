@@ -3,11 +3,15 @@ const grpc = require('@grpc/grpc-js');
 const connectMongo = require('./src/database/mongo');
 const loadProto = require('./src/utils/loadProto');
 const socialService = require('./src/services/socialService');
+const initializeQueueConsumers = require('./src/queue');
 
 dotenv.config();
 
-connectMongo().then(() => {
+connectMongo().then(async () => {
   console.log('✅ Conectado a MongoDB');
+
+  await initializeQueueConsumers();
+  console.log('✅ RabbitMQ Consumers inicializados');
 
   const server = new grpc.Server();
   const SocialProto = loadProto('social');
